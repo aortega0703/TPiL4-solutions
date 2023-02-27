@@ -16,8 +16,26 @@ example : p ∨ q ↔ q ∨ p :=
       (λ x : p => Or.inl x) ⟩
 
 -- associativity of ∧ and ∨
-example : (p ∧ q) ∧ r ↔ p ∧ (q ∧ r) := sorry
-example : (p ∨ q) ∨ r ↔ p ∨ (q ∨ r) := sorry
+example : (p ∧ q) ∧ r ↔ p ∧ (q ∧ r) :=
+  ⟨ λ x : (p ∧ q) ∧ r =>
+    ⟨x.1.1, ⟨x.1.2, x.2⟩⟩
+  , λ x : p ∧ (q ∧ r) =>
+    ⟨⟨x.1, x.2.1⟩, x.2.2⟩ ⟩ 
+example : (p ∨ q) ∨ r ↔ p ∨ (q ∨ r) := 
+  ⟨ λ pqr : (p ∨ q) ∨ r =>
+    pqr.elim
+      (λ pq : p ∨ q =>
+        pq.elim 
+          (λ x : p => Or.inl x)
+          (λ x : q => Or.inr (Or.inl x)))
+      (λ x : r => Or.inr (Or.inr x))
+  , λ pqr : p ∨ (q ∨ r) =>
+    pqr.elim
+      (λ x : p => Or.inl (Or.inl x))
+      (λ qr : q ∨ r =>
+        qr.elim
+          (λ x : q => Or.inl (Or.inr x))
+          (λ x : r => Or.inr x)) ⟩
 
 -- distributivity
 example : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := sorry
