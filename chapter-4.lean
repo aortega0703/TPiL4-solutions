@@ -70,7 +70,16 @@ example : (∀ x, r → p x) ↔ (r → ∀ x, p x) :=
 variable (men : Type) (barber : men)
 variable (shaves : men → men → Prop)
 
-example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : False := sorry
+open Classical
+
+example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : False :=
+  have h2 : shaves barber barber ↔ ¬ shaves barber barber := h barber
+  Or.elim (em (shaves barber barber))
+    (fun h3 : shaves barber barber =>
+      (h2.mp h3) h3)
+    (fun h3 : ¬(shaves barber barber) =>
+      h3 (h2.mpr h3))
+
 -- try it 
 def even (n : Nat) : Prop := sorry
 
