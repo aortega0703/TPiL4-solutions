@@ -2,8 +2,18 @@
 variable (p q r : Prop)
 
 -- commutativity of ∧ and ∨
-example : p ∧ q ↔ q ∧ p := sorry
-example : p ∨ q ↔ q ∨ p := sorry
+example : p ∧ q ↔ q ∧ p :=
+  ⟨ λ pq : p ∧ q => ⟨pq.2 , pq.1⟩
+  , λ qp : q ∧ p => ⟨qp.2 , qp.1⟩ ⟩
+example : p ∨ q ↔ q ∨ p :=
+  ⟨ λ pq : p ∨ q =>
+    pq.elim
+      (λ x : p => Or.inr x)
+      (λ x : q => Or.inl x)
+  , λ qp : q ∨ p =>
+    qp.elim
+      (λ x : q => Or.inr x)
+      (λ x : p => Or.inl x) ⟩
 
 -- associativity of ∧ and ∨
 example : (p ∧ q) ∧ r ↔ p ∧ (q ∧ r) := sorry
