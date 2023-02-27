@@ -81,18 +81,50 @@ example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : False :=
       h3 (h2.mpr h3))
 
 -- try it 
-def even (n : Nat) : Prop := sorry
 
-def prime (n : Nat) : Prop := sorry
+def divides (n m : Nat) : Prop :=
+  ∃ (k : Nat), k * n = m
 
-def infinitely_many_primes : Prop := sorry
+def even (n : Nat) : Prop := 
+  divides 2 n
 
-def Fermat_prime (n : Nat) : Prop := sorry
+def prime (n : Nat) : Prop := 
+  ∀ (k : Nat), k != n ∧ k != n → ¬(divides k n)
 
-def infinitely_many_Fermat_primes : Prop := sorry
+def infinitely_many_primes : Prop := 
+  ∀ (n : Nat), ∃ (k : Nat), k > n ∧ prime k
 
-def goldbach_conjecture : Prop := sorry
+def Fermat_prime (n : Nat) : Prop := 
+  prime n ∧ ∃ (k : Nat), (2^k + 1= n)
 
-def Goldbach's_weak_conjecture : Prop := sorry
+def infinitely_many_Fermat_primes : Prop := 
+  ∀ (n : Nat), ∃ (k : Nat), k > n ∧ Fermat_prime k  
 
-def Fermat's_last_theorem : Prop := sorry
+def goldbach_conjecture : Prop := 
+  ∀ (n : Nat), n > 2 ∧ even n → ∃ (p q : Nat), prime p ∧ prime q ∧ p + q = n 
+
+def Goldbach's_weak_conjecture : Prop := 
+  ∀ (n : Nat), n > 2 ∧ even n → 
+    ∃ (p q r : Nat), prime p ∧ prime q ∧ prime r ∧
+      p + q + r = n 
+
+def Fermat's_last_theorem : Prop :=
+  ∀ (n : Nat), n > 2 → 
+    ¬∃ (a b c : Nat), a^n + b^n = c^n  
+
+variable (α : Type) (p q : α → Prop)
+variable (r : Prop)
+
+example : (∃ x : α, r) → r := sorry
+example (a : α) : r → (∃ x : α, r) := sorry
+example : (∃ x, p x ∧ r) ↔ (∃ x, p x) ∧ r := sorry
+example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) := sorry
+
+example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) := sorry
+example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) := sorry
+example : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) := sorry
+example : (¬ ∀ x, p x) ↔ (∃ x, ¬ p x) := sorry
+
+example : (∀ x, p x → r) ↔ (∃ x, p x) → r := sorry
+example (a : α) : (∃ x, p x → r) ↔ (∀ x, p x) → r := sorry
+example (a : α) : (∃ x, r → p x) ↔ (r → ∃ x, p x) := sorry
