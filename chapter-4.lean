@@ -115,16 +115,122 @@ def Fermat's_last_theorem : Prop :=
 variable (α : Type) (p q : α → Prop)
 variable (r : Prop)
 
-example : (∃ x : α, r) → r := sorry
-example (a : α) : r → (∃ x : α, r) := sorry
-example : (∃ x, p x ∧ r) ↔ (∃ x, p x) ∧ r := sorry
-example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) := sorry
+example : (∃ _ : α, r) → r := 
+  fun h : (∃ _ : α, r) =>
+    h.elim (fun _: α => fun hw: r => hw)
+example (a : α) : r → (∃ _ : α, r) := 
+  fun h: r =>
+      Exists.intro a h 
+example : (∃ x, p x ∧ r) ↔ (∃ x, p x) ∧ r :=
+  Iff.intro
+    (fun h: (∃ x, p x ∧ r) =>
+      h.elim (fun w : α => fun hw : p w ∧ r =>
+        ⟨Exists.intro w (hw).left, (hw).right⟩))
+    (fun ⟨⟨w, hw⟩, hr⟩ =>
+      ⟨w, hw, hr⟩)
+example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) := 
+  Iff.intro
+    (fun h : (∃ x, p x ∨ q x) =>
+      match h with
+      | ⟨w, hw⟩ => Or.elim hw
+        (fun hpw : p w => Or.inl ⟨w, hpw⟩)
+        (fun hqw : q w => Or.inr ⟨w, hqw⟩))
+    (fun h : (∃ x, p x) ∨ (∃ x, q x) =>
+      Or.elim h
+        (fun h1 : (∃ x, p x) =>
+          let ⟨w, h1w⟩ := h1
+          ⟨w, Or.inl h1w⟩)
+        (fun h1 : (∃ x, q x) =>
+          let ⟨w, h1w⟩ := h1
+          ⟨w, Or.inr h1w⟩))
+example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) := 
+  Iff.intro
+    (fun h: (∀ x, p x) =>
+      fun h2: (∃ x, ¬ p x) =>
+        let ⟨w, wh2⟩ := h2
+        wh2 (h w))
+    (fun h: ¬(∃ x, ¬ p x) =>
+      fun z: α =>
+        Or.elim (em (p z))
+          (fun hpz: p z => hpz)
+          (fun hnpz: ¬(p z) => absurd ⟨z, hnpz⟩ h))
+example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) :=
+  Iff.intro
+    (fun h: (∃ x, p x) =>
+      let ⟨w, wh⟩ := h
+      fun h2: (∀ x, ¬ p x) =>
+        (h2 w) wh)
+    (fun h: ¬(∀ x, ¬ p x) =>
+      byContradiction
+        fun h2 : ¬(∃ x, p x) =>
+          h fun x : α =>
+            fun hx : p x =>
+              h2 ⟨x, hx⟩)
+def not_exist_all_not : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) := 
+  Iff.intro
+    (fun h: (¬ ∃ x, p x) => 
+      fun x : α =>
+        fun hx : p x =>
+          h ⟨x, hx⟩ )
+    (fun h: (∀ x, ¬ p x) =>
+      fun h2: (∃ x, p x) =>
+        let ⟨w, hw⟩ := h2
+        (h w) hw)
+example : (¬ ∀ x, p x) ↔ (∃ x, ¬ p x) := 
+  Iff.intro
+    (fun h: (¬ ∀ x, p x) =>
+      byContradiction
+        fun h2 : ¬(∃ x, ¬ p x) =>
+          h fun x : α =>
+            Or.elim (em (p x))
+              (fun hpx : p x => hpx)
+              (fun hnpx : ¬(p x) => absurd ⟨x, hnpx⟩ h2 ))
+    (fun h: (∃ x, ¬ p x) =>
+      fun h2: (∀ x, p x) =>
+        let ⟨w, hw⟩ := h
+        hw (h2 w) )
 
-example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) := sorry
-example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) := sorry
-example : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) := sorry
-example : (¬ ∀ x, p x) ↔ (∃ x, ¬ p x) := sorry
-
-example : (∀ x, p x → r) ↔ (∃ x, p x) → r := sorry
-example (a : α) : (∃ x, p x → r) ↔ (∀ x, p x) → r := sorry
-example (a : α) : (∃ x, r → p x) ↔ (r → ∃ x, p x) := sorry
+example : (∀ x, p x → r) ↔ (∃ x, p x) → r := 
+  Iff.intro
+    (fun h : (∀ x, p x → r) =>
+      fun h2 : (∃ x, p x) =>
+        let ⟨w, hw⟩ := h2
+        (h w) hw)
+    (fun h : (∃ x, p x) → r =>
+      fun w : α =>
+        fun hw : p w => 
+          h ⟨w, hw⟩ )
+  
+example (a : α) : (∃ x, p x → r) ↔ (∀ x, p x) → r :=
+  Iff.intro
+    (fun ⟨b, (hb : p b → r)⟩ =>
+     fun h2 : ∀ x, p x =>
+     show r from hb (h2 b))
+    (fun h1 : (∀ x, p x) → r =>
+     show ∃ x, p x → r from
+       byCases
+         (fun hap : ∀ x, p x => ⟨a, λ _ => h1 hap⟩)
+         (fun hnap : ¬ ∀ x, p x =>
+          byContradiction
+            (fun hnex : ¬ ∃ x, p x → r =>
+              have hap : ∀ x, p x :=
+                fun x =>
+                byContradiction
+                  (fun hnp : ¬ p x =>
+                    have hex : ∃ x, p x → r := ⟨x, (fun hp => absurd hp hnp)⟩
+                    show False from hnex hex)
+              show False from hnap hap)))
+example (a : α) : (∃ x, r → p x) ↔ (r → ∃ x, p x) :=
+  Iff.intro
+    (fun h : (∃ x, r → p x) =>
+      fun hr : r =>
+        let ⟨w, hw⟩ := h
+        ⟨w, hw hr⟩ )
+    (fun h : (r → ∃ x, p x) =>
+      byCases
+        (fun hr : r => 
+          let ⟨w, hw⟩ := h hr
+          ⟨w, λ _ => hw⟩  )
+        (fun hnr : ¬r =>
+          ⟨a, fun hr : r =>
+            absurd hr hnr⟩ ))
