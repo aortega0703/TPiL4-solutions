@@ -1,9 +1,27 @@
 -- try it 
 variable (α : Type) (p q : α → Prop)
 
-example : (∀ x, p x ∧ q x) ↔ (∀ x, p x) ∧ (∀ x, q x) := sorry
-example : (∀ x, p x → q x) → (∀ x, p x) → (∀ x, q x) := sorry
-example : (∀ x, p x) ∨ (∀ x, q x) → ∀ x, p x ∨ q x := sorry
+example : (∀ x, p x ∧ q x) ↔ (∀ x, p x) ∧ (∀ x, q x) :=
+  ⟨
+    λ h : ∀ x, p x ∧ q x =>
+      ⟨ λ x : α => (h x).left,
+        λ x : α => (h x).right ⟩,
+    λ h : (∀ x, p x) ∧ (∀ x, q x) =>
+      λ x : α => 
+        ⟨ h.left x , h.right x⟩
+  ⟩  
+example : (∀ x, p x → q x) → (∀ x, p x) → (∀ x, q x) :=
+  fun h1 : (∀ x, p x → q x) =>
+    fun h2 : (∀ x, p x) =>
+      fun x : α => (h1 x) (h2 x)
+example : (∀ x, p x) ∨ (∀ x, q x) → ∀ x, p x ∨ q x :=
+  fun h : (∀ x, p x) ∨ (∀ x, q x) =>
+    fun x : α =>
+      h.elim
+        (fun hl : (∀ x, p x) =>
+          Or.inl (hl x))
+        (fun hr : (∀ x, q x) =>
+          Or.inr (hr x))
 -- try it 
 variable (α : Type) (p q : α → Prop)
 variable (r : Prop)
