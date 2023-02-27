@@ -26,9 +26,46 @@ example : (∀ x, p x) ∨ (∀ x, q x) → ∀ x, p x ∨ q x :=
 variable (α : Type) (p q : α → Prop)
 variable (r : Prop)
 
-example : α → ((∀ x : α, r) ↔ r) := sorry
-example : (∀ x, p x ∨ r) ↔ (∀ x, p x) ∨ r := sorry
-example : (∀ x, r → p x) ↔ (r → ∀ x, p x) := sorry
+open Classical
+
+example : α → ((∀ _ : α, r) ↔ r) :=
+  fun a : α =>
+    ⟨
+      fun x : (∀ _ : α, r) => x a,
+      fun y : r =>
+        fun _ : α => y
+    ⟩
+example : (∀ x, p x ∨ r) ↔ (∀ x, p x) ∨ r :=
+  ⟨
+    fun h : (∀ x, p x ∨ r) =>
+      show (∀ x, p x) ∨ r from
+      Or.elim (em r)
+        (fun hr : r => Or.inr hr)
+        (fun hnr : ¬r => 
+          Or.inl fun ha : α =>
+            Or.elim (h ha)
+              (fun hpx : (p ha) => hpx)
+              (fun hr : r => absurd hr hnr)),
+    fun h : (∀ x, p x) ∨ r =>
+      show (∀ x, p x ∨ r) from
+      fun a : α => 
+        Or.elim h
+          (fun hl : (∀ x, p x) => Or.inl (hl a))
+          (fun hr : r => Or.inr hr)
+  ⟩  
+example : (∀ x, r → p x) ↔ (r → ∀ x, p x) :=
+  ⟨
+    λ h : (∀ x, r → p x) =>
+      show (r → ∀ x, p x) from
+      λ hr : r =>
+        λ ha : α =>
+          h ha hr,
+    λ h : r → ∀ x, p x =>
+      show (∀ x, r → p x) from
+      λ ha : α => 
+        λ hr : r =>
+          h hr ha 
+  ⟩ 
 -- try it 
 variable (men : Type) (barber : men)
 variable (shaves : men → men → Prop)
