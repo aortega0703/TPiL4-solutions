@@ -67,14 +67,71 @@ example : p ∨ (q ∧ r) ↔ (p ∨ q) ∧ (p ∨ r) :=
             (λ y : r => Or.inr ⟨x, y⟩)) ⟩  
 
 -- other properties
-example : (p → (q → r)) ↔ (p ∧ q → r) := sorry
-example : ((p ∨ q) → r) ↔ (p → r) ∧ (q → r) := sorry
-example : ¬(p ∨ q) ↔ ¬p ∧ ¬q := sorry
-example : ¬p ∨ ¬q → ¬(p ∧ q) := sorry
-example : ¬(p ∧ ¬p) := sorry
-example : p ∧ ¬q → ¬(p → q) := sorry
-example : ¬p → (p → q) := sorry
-example : (¬p ∨ q) → (p → q) := sorry
-example : p ∨ False ↔ p := sorry
-example : p ∧ False ↔ False := sorry
-example : (p → q) → (¬q → ¬p) := sorry
+example : (p → (q → r)) ↔ (p ∧ q → r) :=
+  Iff.intro
+    (λ hpqr : p → q → r =>
+        λ hpq : p ∧ q =>
+          hpqr hpq.1 hpq.2)
+    (λ hpqr : (p ∧ q) → r =>
+        λ hp : p =>
+          λ hq : q =>
+            hpqr ⟨hp, hq⟩)
+example : ((p ∨ q) → r) ↔ (p → r) ∧ (q → r) :=
+  ⟨ λ h : (p ∨ q) → r =>
+    ⟨ λ hp : p =>
+      h (Or.inl hp)
+    , λ hq : q =>
+      h (Or.inr hq) ⟩
+  , λ h : (p → r) ∧ (q → r) =>
+    λ hpq : p ∨ q =>
+      hpq.elim h.left h.right⟩
+example : ¬(p ∨ q) ↔ ¬p ∧ ¬q :=
+  ⟨
+    λ h : ¬(p ∨ q) =>
+      ⟨ λ hp : p => h (Or.inl hp)
+      , λ hq : q => h (Or.inr hq)⟩,
+    λ h : ¬p ∧ ¬q =>
+      λ hpq : p ∨ q =>
+        hpq.elim h.left h.right 
+  ⟩
+example : ¬p ∨ ¬q → ¬(p ∧ q) := 
+  λ h : ¬p ∨ ¬q =>
+    λ hpq : p ∧ q =>
+      h.elim
+        (λ hnp : ¬p => hnp hpq.left)
+        (λ hnq : ¬q => hnq hpq.right)
+example : ¬(p ∧ ¬p) := 
+  λ h : p ∧ ¬p => h.right h.left
+example : p ∧ ¬q → ¬(p → q) := 
+  λ h : p ∧ ¬q =>
+    λ npq : p → q =>
+      h.right (npq h.left)
+example : ¬p → (p → q) := 
+  λ hnp : ¬p =>
+    λ hp : p =>
+      absurd hp hnp
+example : (¬p ∨ q) → (p → q) := 
+  λ h : ¬p ∨ q =>
+    λ hp : p =>
+      h.elim
+        (λ hnp : ¬p => absurd hp hnp)
+        (λ hq : q => hq)
+example : p ∨ False ↔ p := 
+  ⟨
+    λ h : p ∨ False =>
+      h.elim
+        (λ hp : p => hp)
+        (λ hFalse : False => False.elim hFalse),
+    λ h : p =>
+      Or.inl h
+  ⟩ 
+example : p ∧ False ↔ False := 
+  ⟨
+    λ h : p ∧ False => h.right,
+    λ h : False => ⟨False.elim h, h⟩  
+  ⟩
+example : (p → q) → (¬q → ¬p) := 
+  λ h : p → q =>
+    λ hnq : ¬q =>
+      λ hp : p =>
+        hnq (h hp)
