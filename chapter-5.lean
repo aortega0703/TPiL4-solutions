@@ -38,34 +38,29 @@ example : (p ∨ q) ∨ r ↔ p ∨ (q ∨ r) := by
       | inl hrl => apply Or.inl (Or.inr hrl)
       | inr hrr => apply Or.inr hrr
 -- distributivity
-example : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) :=
-  ⟨ λ pqr : p ∧ (q ∨ r) =>
-    pqr.2.elim
-      (λ y : q =>
-        Or.inl ⟨pqr.1, y⟩ )
-      (λ y : r =>
-        Or.inr ⟨pqr.1, y⟩ )
-  , λ pqpr : (p ∧ q) ∨ (p ∧ r) =>
-    pqpr.elim
-      (λ pq : p ∧ q =>
-        ⟨pq.1, Or.inl pq.2⟩)
-      (λ pr : p ∧ r =>
-        ⟨pr.1, Or.inr pr.2⟩)⟩
-example : p ∨ (q ∧ r) ↔ (p ∨ q) ∧ (p ∨ r) :=
-  ⟨ λ pqr : p ∨ (q ∧ r) =>
-    pqr.elim
-      (λ x : p =>
-        ⟨Or.inl x, Or.inl x⟩)
-      (λ qr : q ∧ r =>
-        ⟨Or.inr qr.1, Or.inr qr.2⟩),
-    λ pqpr : (p ∨ q) ∧ (p ∨ r) =>
-      pqpr.1.elim
-        (λ x : p => Or.inl x)
-        (λ x : q =>
-          pqpr.2.elim
-            (λ y : p => Or.inl y)
-            (λ y : r => Or.inr ⟨x, y⟩)) ⟩
-
+example : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
+  apply Iff.intro
+  . intro ⟨h1, h2⟩
+    cases h2 with
+    | inl h2l => apply Or.inl ⟨h1, h2l⟩
+    | inr h2r => apply Or.inr ⟨h1, h2r⟩
+  . intro h
+    cases h with
+    | inl hl => apply And.intro hl.left (Or.inl hl.right)
+    | inr hr => apply And.intro hr.left (Or.inr hr.right)
+example : p ∨ (q ∧ r) ↔ (p ∨ q) ∧ (p ∨ r) := by
+  apply Iff.intro
+  . intro h
+    cases h with
+    | inl hl => apply And.intro (Or.inl hl) (Or.inl hl)
+    | inr hr => apply And.intro (Or.inr hr.left) (Or.inr hr.right)
+  . intro h
+    cases h.left with
+    | inl hl => apply Or.inl hl
+    | inr hr =>
+      cases h.right with
+      | inl hl => apply Or.inl hl
+      | inr hrr => apply Or.inr ⟨hr, hrr⟩ 
 -- other properties
 example : (p → (q → r)) ↔ (p ∧ q → r) :=
   Iff.intro
