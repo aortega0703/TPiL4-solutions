@@ -1,4 +1,3 @@
--- try it
 variable (α : Type) (p q : α → Prop)
 
 example : (∀ x, p x ∧ q x) ↔ (∀ x, p x) ∧ (∀ x, q x) :=
@@ -10,10 +9,12 @@ example : (∀ x, p x ∧ q x) ↔ (∀ x, p x) ∧ (∀ x, q x) :=
       λ x : α =>
         ⟨ h.left x , h.right x⟩
   ⟩
+
 example : (∀ x, p x → q x) → (∀ x, p x) → (∀ x, q x) :=
   fun h1 : (∀ x, p x → q x) =>
     fun h2 : (∀ x, p x) =>
       fun x : α => (h1 x) (h2 x)
+
 example : (∀ x, p x) ∨ (∀ x, q x) → ∀ x, p x ∨ q x :=
   fun h : (∀ x, p x) ∨ (∀ x, q x) =>
     fun x : α =>
@@ -22,8 +23,7 @@ example : (∀ x, p x) ∨ (∀ x, q x) → ∀ x, p x ∨ q x :=
           Or.inl (hl x))
         (fun hr : (∀ x, q x) =>
           Or.inr (hr x))
--- try it
-variable (α : Type) (p q : α → Prop)
+
 variable (r : Prop)
 
 open Classical
@@ -35,6 +35,7 @@ example : α → ((∀ _ : α, r) ↔ r) :=
       fun y : r =>
         fun _ : α => y
     ⟩
+
 example : (∀ x, p x ∨ r) ↔ (∀ x, p x) ∨ r :=
   ⟨
     fun h : (∀ x, p x ∨ r) =>
@@ -53,6 +54,7 @@ example : (∀ x, p x ∨ r) ↔ (∀ x, p x) ∨ r :=
           (fun hl : (∀ x, p x) => Or.inl (hl a))
           (fun hr : r => Or.inr hr)
   ⟩
+
 example : (∀ x, r → p x) ↔ (r → ∀ x, p x) :=
   ⟨
     λ h : (∀ x, r → p x) =>
@@ -66,11 +68,9 @@ example : (∀ x, r → p x) ↔ (r → ∀ x, p x) :=
         λ hr : r =>
           h hr ha
   ⟩
--- try it
+
 variable (men : Type) (barber : men)
 variable (shaves : men → men → Prop)
-
-open Classical
 
 example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : False :=
   have h2 : shaves barber barber ↔ ¬ shaves barber barber := h barber
@@ -79,8 +79,6 @@ example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : False :=
       (h2.mp h3) h3)
     (fun h3 : ¬(shaves barber barber) =>
       h3 (h2.mpr h3))
-
--- try it
 
 def divides (n m : Nat) : Prop :=
   ∃ (k : Nat), k * n = m
@@ -112,15 +110,14 @@ def Fermat's_last_theorem : Prop :=
   ∀ (n : Nat), n > 2 →
     ¬∃ (a b c : Nat), a^n + b^n = c^n
 
-variable (α : Type) (p q : α → Prop)
-variable (r : Prop)
-
 example : (∃ _ : α, r) → r :=
   fun h : (∃ _ : α, r) =>
     h.elim (fun _: α => fun hw: r => hw)
+
 example (a : α) : r → (∃ _ : α, r) :=
   fun h: r =>
       Exists.intro a h
+
 example : (∃ x, p x ∧ r) ↔ (∃ x, p x) ∧ r :=
   Iff.intro
     (fun h: (∃ x, p x ∧ r) =>
@@ -128,6 +125,7 @@ example : (∃ x, p x ∧ r) ↔ (∃ x, p x) ∧ r :=
         ⟨Exists.intro w (hw).left, (hw).right⟩))
     (fun ⟨⟨w, hw⟩, hr⟩ =>
       ⟨w, hw, hr⟩)
+
 example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) :=
   Iff.intro
     (fun h : (∃ x, p x ∨ q x) =>
@@ -143,6 +141,7 @@ example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) :=
         (fun h1 : (∃ x, q x) =>
           let ⟨w, h1w⟩ := h1
           ⟨w, Or.inr h1w⟩))
+
 example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) :=
   Iff.intro
     (fun h: (∀ x, p x) =>
@@ -154,6 +153,7 @@ example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) :=
         Or.elim (em (p z))
           (fun hpz: p z => hpz)
           (fun hnpz: ¬(p z) => absurd ⟨z, hnpz⟩ h))
+
 example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) :=
   Iff.intro
     (fun h: (∃ x, p x) =>
@@ -166,7 +166,8 @@ example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) :=
           h fun x : α =>
             fun hx : p x =>
               h2 ⟨x, hx⟩)
-def not_exist_all_not : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) :=
+
+example : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) :=
   Iff.intro
     (fun h: (¬ ∃ x, p x) =>
       fun x : α =>
@@ -176,6 +177,7 @@ def not_exist_all_not : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) :=
       fun h2: (∃ x, p x) =>
         let ⟨w, hw⟩ := h2
         (h w) hw)
+
 example : (¬ ∀ x, p x) ↔ (∃ x, ¬ p x) :=
   Iff.intro
     (fun h: (¬ ∀ x, p x) =>
@@ -220,6 +222,7 @@ example (a : α) : (∃ x, p x → r) ↔ (∀ x, p x) → r :=
                     have hex : ∃ x, p x → r := ⟨x, (fun hp => absurd hp hnp)⟩
                     show False from hnex hex)
               show False from hnap hap)))
+
 example (a : α) : (∃ x, r → p x) ↔ (r → ∃ x, p x) :=
   Iff.intro
     (fun h : (∃ x, r → p x) =>

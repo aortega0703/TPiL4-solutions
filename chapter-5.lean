@@ -101,96 +101,49 @@ example : ¬p ∨ ¬q → ¬(p ∧ q) := by
   | inl hl => apply hl h2.left
   | inr hr => apply hr h2.right
  
-example : ¬(p ∧ ¬p) :=
-  λ h : p ∧ ¬p => h.right h.left
-example : p ∧ ¬q → ¬(p → q) :=
-  λ h : p ∧ ¬q =>
-    λ npq : p → q =>
-      h.right (npq h.left)
-example : ¬p → (p → q) :=
-  λ hnp : ¬p =>
-    λ hp : p =>
-      absurd hp hnp
-example : (¬p ∨ q) → (p → q) :=
-  λ h : ¬p ∨ q =>
-    λ hp : p =>
-      h.elim
-        (λ hnp : ¬p => absurd hp hnp)
-        (λ hq : q => hq)
-example : p ∨ False ↔ p :=
-  ⟨
-    λ h : p ∨ False =>
-      h.elim
-        (λ hp : p => hp)
-        (λ hFalse : False => False.elim hFalse),
-    λ h : p =>
-      Or.inl h
-  ⟩
-example : p ∧ False ↔ False :=
-  ⟨
-    λ h : p ∧ False => h.right,
-    λ h : False => ⟨False.elim h, h⟩
-  ⟩
-example : (p → q) → (¬q → ¬p) :=
-  λ h : p → q =>
-    λ hnq : ¬q =>
-      λ hp : p =>
-        hnq (h hp)
+example : ¬(p ∧ ¬p) := by
+  admit
+
+example : p ∧ ¬q → ¬(p → q) := by
+  admit
+
+example : ¬p → (p → q) := by
+  admit
+  
+example : (¬p ∨ q) → (p → q) := by
+  admit
+
+example : p ∨ False ↔ p := by
+  admit
+
+example : p ∧ False ↔ False := by
+  admit
+  
+example : (p → q) → (¬q → ¬p) := by
+  admit
 
 open Classical
 
-variable (p q r : Prop)
+example : (p → q ∨ r) → ((p → q) ∨ (p → r)) := by
+  admit
+  
+example : ¬(p ∧ q) → ¬p ∨ ¬q := by
+  admit
 
-example : (p → q ∨ r) → ((p → q) ∨ (p → r)) :=
-  λ h : p → q ∨ r =>
-    (em p).elim
-      (λ hp : p =>
-        (h hp).elim
-          (λ hq : q => Or.inl (λ _ : p => hq))
-          (λ hr : r => Or.inr (λ _ : p => hr)))
-      (λ hnp : ¬p =>
-        Or.inl (λ hp : p => absurd hp hnp))
-example : ¬(p ∧ q) → ¬p ∨ ¬q :=
-  λ h : ¬(p ∧ q) =>
-    Or.elim (em p)
-      (λ hp : p =>
-        Or.elim (em q)
-          (λ hq : q => absurd ⟨hp, hq⟩ h )
-          (λ hnq : ¬q => Or.inr hnq))
-      (λ hnp : ¬p => Or.inl hnp)
-example : ¬(p → q) → p ∧ ¬q :=
-  λ h : ¬(p → q) =>
-    Or.elim (em q)
-      (λ hq : q =>
-        absurd (λ _ : p => hq) h)
-      (λ hnq : ¬q =>
-        Or.elim (em p)
-          (λ hp : p => ⟨ hp, hnq ⟩)
-          (λ hnp : ¬p =>
-            absurd (λ hp : p => absurd hp hnp) h))
-example : (p → q) → (¬p ∨ q) :=
-  λ h : p → q =>
-    Or.elim (em p)
-      (λ hp : p => Or.inr (h hp))
-      (λ hnp : ¬p => Or.inl hnp)
-example : (¬q → ¬p) → (p → q) :=
-  λ h : ¬q → ¬p =>
-    Or.elim (em p)
-      (λ hp : p =>
-        Or.elim (em q)
-          (λ hq : q =>
-            λ _ : p => hq)
-          (λ hnq : ¬q => absurd hp (h hnq)))
-      (λ hnp : ¬p =>
-        λ hp : p => absurd hp hnp)
-example : p ∨ ¬p :=
-  em p
-example : (((p → q) → p) → p) :=
-  λ h : (p → q) → p =>
-    Or.elim (em p)
-      (λ hp : p => hp)
-      (λ hnp : ¬p =>
-        h (λ hp : p => absurd hp hnp))
+example : ¬(p → q) → p ∧ ¬q := by
+  admit
+
+example : (p → q) → (¬p ∨ q) := by
+  admit
+
+example : (¬q → ¬p) → (p → q) := by
+  admit
+
+example : p ∨ ¬p := by
+  admit
+
+example : (((p → q) → p) → p) := by
+  admit
 
 example (p q r : Prop) (hp : p)
   : (p ∨ q ∨ r) ∧ (q ∨ p ∨ r) ∧ (q ∨ r ∨ p) := by
