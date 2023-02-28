@@ -142,24 +142,146 @@ example : (p → q) → (¬q → ¬p) := by
 open Classical
 
 example : (p → q ∨ r) → ((p → q) ∨ (p → r)) := by
-  admit
+  intro h
+  cases (em p) with
+  | inl hp => 
+    apply (h hp).elim
+    . intro hq
+      apply Or.inl (λ _ : p => hq) 
+    . intro hr
+      apply Or.inr (λ _ : p => hr)
+  | inr hnp =>
+    apply Or.inl (λ hp : p => absurd hp hnp)
   
 example : ¬(p ∧ q) → ¬p ∨ ¬q := by
-  admit
+  intro h
+  cases (em p) with
+  | inl hp =>
+    cases (em q) with
+    | inl hq => 
+      apply absurd (And.intro hp hq) h 
+    | inr hnq => 
+      apply Or.inr 
+      assumption
+  | inr hnp =>
+    apply Or.inl
+    assumption
 
 example : ¬(p → q) → p ∧ ¬q := by
-  admit
+  intro h
+  cases (em q) with
+  | inl hq =>
+    apply absurd (λ _ : p => hq) h
+  | inr hnq =>
+    cases (em p) with
+    | inl hp =>
+      apply And.intro
+      repeat assumption
+    | inr hnp =>
+      exact False.elim (h (λ hp : p => absurd hp hnp))
 
 example : (p → q) → (¬p ∨ q) := by
-  admit
+  intro h
+  cases (em p) with
+  | inl hp =>
+    apply Or.inr
+    exact h hp
+  | inr hnp =>
+    apply Or.inl
+    assumption
 
 example : (¬q → ¬p) → (p → q) := by
-  admit
+  intro h hp
+  cases (em q) with
+  | inl hq => assumption
+  | inr hnq => apply absurd hp (h hnq)
 
 example : p ∨ ¬p := by
-  admit
+  apply (em p)
 
 example : (((p → q) → p) → p) := by
+  intro h
+  cases (em p) with
+  | inl hp => assumption
+  | inr hnp => apply h (λ hp : p => absurd hp hnp)
+
+variable (α : Type) (p q : α → Prop)
+
+example : (∀ x, p x ∧ q x) ↔ (∀ x, p x) ∧ (∀ x, q x) := by
+  admit
+
+
+example : (∀ x, p x → q x) → (∀ x, p x) → (∀ x, q x) := by
+  admit
+
+
+example : (∀ x, p x) ∨ (∀ x, q x) → ∀ x, p x ∨ q x := by
+  admit
+
+
+variable (r : Prop)
+
+open Classical
+
+example : α → ((∀ _ : α, r) ↔ r) := by
+  admit
+
+
+example : (∀ x, p x ∨ r) ↔ (∀ x, p x) ∨ r := by
+  admit
+
+
+example : (∀ x, r → p x) ↔ (r → ∀ x, p x) := by
+  admit
+
+
+variable (men : Type) (barber : men)
+variable (shaves : men → men → Prop)
+
+example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : False := by
+  admit
+
+
+example : (∃ _ : α, r) → r := by
+  admit
+
+
+example (a : α) : r → (∃ _ : α, r) := by
+  admit
+
+
+example : (∃ x, p x ∧ r) ↔ (∃ x, p x) ∧ r := by
+  admit
+
+
+example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) := by
+  admit
+
+
+example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) := by
+  admit
+
+
+example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) := by
+  admit
+
+
+example : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) := by
+  admit
+
+
+example : (¬ ∀ x, p x) ↔ (∃ x, ¬ p x) := by
+  admit
+
+
+example : (∀ x, p x → r) ↔ (∃ x, p x) → r := by
+  admit
+
+
+example (a : α) : (∃ x, p x → r) ↔ (∀ x, p x) → r := by
+  admit
+
+example (a : α) : (∃ x, r → p x) ↔ (r → ∃ x, p x) := by
   admit
 
 example (p q r : Prop) (hp : p)
