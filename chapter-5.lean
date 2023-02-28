@@ -15,27 +15,28 @@ example : p ∨ q ↔ q ∨ p := by
     | inr hq => apply Or.inl hq
 
 -- associativity of ∧ and ∨
-example : (p ∧ q) ∧ r ↔ p ∧ (q ∧ r) :=
-  ⟨ λ x : (p ∧ q) ∧ r =>
-    ⟨x.1.1, ⟨x.1.2, x.2⟩⟩
-  , λ x : p ∧ (q ∧ r) =>
-    ⟨⟨x.1, x.2.1⟩, x.2.2⟩ ⟩
-example : (p ∨ q) ∨ r ↔ p ∨ (q ∨ r) :=
-  ⟨ λ pqr : (p ∨ q) ∨ r =>
-    pqr.elim
-      (λ pq : p ∨ q =>
-        pq.elim
-          (λ x : p => Or.inl x)
-          (λ x : q => Or.inr (Or.inl x)))
-      (λ x : r => Or.inr (Or.inr x))
-  , λ pqr : p ∨ (q ∨ r) =>
-    pqr.elim
-      (λ x : p => Or.inl (Or.inl x))
-      (λ qr : q ∨ r =>
-        qr.elim
-          (λ x : q => Or.inl (Or.inr x))
-          (λ x : r => Or.inr x)) ⟩
-
+example : (p ∧ q) ∧ r ↔ p ∧ (q ∧ r) := by
+  apply Iff.intro
+  . intro h
+    apply And.intro h.left.left (And.intro h.left.right h.right)
+  . intro h
+    apply And.intro (And.intro h.left h.right.left) h.right.right
+example : (p ∨ q) ∨ r ↔ p ∨ (q ∨ r) := by
+  apply Iff.intro
+  . intro h
+    cases h with
+    | inl hl => 
+      cases hl with
+      | inl hll => apply Or.inl hll
+      | inr hlr => apply Or.inr (Or.inl hlr)
+    | inr hr => apply Or.inr (Or.inr hr)
+  . intro h
+    cases h with
+    | inl hl => apply Or.inl (Or.inl hl)
+    | inr hr =>
+      cases hr with
+      | inl hrl => apply Or.inl (Or.inr hrl)
+      | inr hrr => apply Or.inr hrr
 -- distributivity
 example : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) :=
   ⟨ λ pqr : p ∧ (q ∨ r) =>
