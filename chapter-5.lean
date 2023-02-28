@@ -102,25 +102,42 @@ example : ¬p ∨ ¬q → ¬(p ∧ q) := by
   | inr hr => apply hr h2.right
  
 example : ¬(p ∧ ¬p) := by
-  admit
+  intro h
+  apply h.right h.left
 
 example : p ∧ ¬q → ¬(p → q) := by
-  admit
+  intro h1 h2
+  apply h1.right (h2 h1.left)
 
 example : ¬p → (p → q) := by
-  admit
+  intro h1 h2
+  apply absurd h2 h1
   
 example : (¬p ∨ q) → (p → q) := by
-  admit
+  intro h1 h2
+  cases h1 with
+  | inl hl => apply absurd h2 hl
+  | inr hr => apply hr
 
 example : p ∨ False ↔ p := by
-  admit
+  apply Iff.intro
+  . intro h
+    cases h with
+    | inl hl => apply hl
+    | inr hr => apply False.elim hr
+  . intro h
+    apply Or.inl h
 
 example : p ∧ False ↔ False := by
-  admit
+  apply Iff.intro
+  . intro h
+    apply h.right
+  . intro h
+    apply False.elim h
   
 example : (p → q) → (¬q → ¬p) := by
-  admit
+  intro h1 h2 h3
+  apply h2 (h1 h3)
 
 open Classical
 
@@ -147,4 +164,4 @@ example : (((p → q) → p) → p) := by
 
 example (p q r : Prop) (hp : p)
   : (p ∨ q ∨ r) ∧ (q ∨ p ∨ r) ∧ (q ∨ r ∨ p) := by
-  admit
+  repeat (first | exact Or.inl hp | exact Or.inr (Or.inl hp) | exact Or.inr (Or.inr hp) | constructor)
