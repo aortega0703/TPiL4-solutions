@@ -26,7 +26,7 @@ example : (p ∨ q) ∨ r ↔ p ∨ (q ∨ r) := by
   apply Iff.intro
   . intro h
     cases h with
-    | inl hl => 
+    | inl hl =>
       cases hl with
       | inl hll => apply Or.inl hll
       | inr hlr => apply Or.inr (Or.inl hlr)
@@ -100,7 +100,7 @@ example : ¬p ∨ ¬q → ¬(p ∧ q) := by
   cases h with
   | inl hl => apply hl h2.left
   | inr hr => apply hr h2.right
- 
+
 example : ¬(p ∧ ¬p) := by
   intro h
   apply h.right h.left
@@ -112,7 +112,7 @@ example : p ∧ ¬q → ¬(p → q) := by
 example : ¬p → (p → q) := by
   intro h1 h2
   apply absurd h2 h1
-  
+
 example : (¬p ∨ q) → (p → q) := by
   intro h1 h2
   cases h1 with
@@ -134,7 +134,7 @@ example : p ∧ False ↔ False := by
     apply h.right
   . intro h
     apply False.elim h
-  
+
 example : (p → q) → (¬q → ¬p) := by
   intro h1 h2 h3
   apply h2 (h1 h3)
@@ -144,24 +144,24 @@ open Classical
 example : (p → q ∨ r) → ((p → q) ∨ (p → r)) := by
   intro h
   cases (em p) with
-  | inl hp => 
+  | inl hp =>
     apply (h hp).elim
     . intro hq
-      apply Or.inl (λ _ : p => hq) 
+      apply Or.inl (λ _ : p => hq)
     . intro hr
       apply Or.inr (λ _ : p => hr)
   | inr hnp =>
     apply Or.inl (λ hp : p => absurd hp hnp)
-  
+
 example : ¬(p ∧ q) → ¬p ∨ ¬q := by
   intro h
   cases (em p) with
   | inl hp =>
     cases (em q) with
-    | inl hq => 
-      apply absurd (And.intro hp hq) h 
-    | inr hnq => 
-      apply Or.inr 
+    | inl hq =>
+      apply absurd (And.intro hp hq) h
+    | inr hnq =>
+      apply Or.inr
       assumption
   | inr hnp =>
     apply Or.inl
@@ -247,7 +247,7 @@ example : (∀ x, p x ∨ r) ↔ (∀ x, p x) ∨ r := by
     cases (em r) with
     | inl hr => exact Or.inr hr
     | inr hnr =>
-      apply Or.inl 
+      apply Or.inl
         (λ ha : α => Or.elim (h ha)
           (λ hpa : p ha => hpa)
           (λ hr : r => absurd hr hnr))
@@ -291,10 +291,10 @@ example : (∃ x, p x ∧ r) ↔ (∃ x, p x) ∧ r := by
     cases h with
     | intro hx hf =>
       have hl := Exists.intro hx hf.left
-      exact And.intro hl hf.right  
+      exact And.intro hl hf.right
   . intro h
     cases h.left with
-    | intro hx hf => apply Exists.intro hx ⟨hf, h.right⟩ 
+    | intro hx hf => apply Exists.intro hx ⟨hf, h.right⟩
 
 example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) := by
   apply Iff.intro
@@ -306,13 +306,13 @@ example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) := by
       | inr hfr => exact Or.inr (Exists.intro hx hfr)
   . intro h
     cases h with
-    | inl hl => 
+    | inl hl =>
       cases hl with
       | intro hx hf => apply Exists.intro hx (Or.inl hf)
     | inr hr =>
       cases hr with
       | intro hx hf => apply Exists.intro hx (Or.inr hf)
-      
+
 example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) := by
   apply Iff.intro
   . intro h1 h2
@@ -334,7 +334,7 @@ example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) := by
           h1 fun x : α =>
             fun hx : p x =>
               h2 ⟨x, hx⟩)
-    
+
 example : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) := by
   apply Iff.intro
   . intro h
@@ -374,7 +374,7 @@ example (a : α) : (∃ x, p x → r) ↔ (∀ x, p x) → r := by
   . intro h
     cases em (∀ (x : α), p x) with
     | inl hem => apply Exists.intro a (λ _ : p a => h hem )
-    | inr hnem => 
+    | inr hnem =>
       apply (fun hnap : ¬ ∀ x, p x =>
         byContradiction
           (fun hnex : ¬ ∃ x, p x → r =>
@@ -391,11 +391,11 @@ example (a : α) : (∃ x, r → p x) ↔ (r → ∃ x, p x) := by
   apply Iff.intro
   . intro h1 h2
     cases h1 with
-    | intro hx hf => 
+    | intro hx hf =>
       apply Exists.intro hx (hf h2)
   . intro h
     cases (em r) with
-    | inl hl => 
+    | inl hl =>
       cases h hl with
       | intro hx hf =>
         apply Exists.intro hx (λ _ : r => hf)
