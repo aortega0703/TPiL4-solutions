@@ -116,7 +116,7 @@ example : (∃ _ : α, r) → r :=
 
 example (a : α) : r → (∃ _ : α, r) :=
   fun h: r =>
-      Exists.intro a h
+    Exists.intro a h
 
 example : (∃ x, p x ∧ r) ↔ (∃ x, p x) ∧ r :=
   Iff.intro
