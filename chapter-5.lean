@@ -304,7 +304,15 @@ example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) := by
       cases hf with
       | inl hfl => exact Or.inl (Exists.intro hx hfl)
       | inr hfr => exact Or.inr (Exists.intro hx hfr)
-
+  . intro h
+    cases h with
+    | inl hl => 
+      cases hl with
+      | intro hx hf => apply Exists.intro hx (Or.inl hf)
+    | inr hr =>
+      cases hr with
+      | intro hx hf => apply Exists.intro hx (Or.inr hf)
+      
 example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) := by
   apply Iff.intro
   . intro h1 h2
