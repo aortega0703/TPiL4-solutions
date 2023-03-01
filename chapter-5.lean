@@ -275,46 +275,125 @@ example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : False := by
   | inr hnsbb => apply hnsbb (hb.mpr hnsbb)
 
 example : (∃ _ : α, r) → r := by
-  admit
-
+  intro h
+  cases h with
+  | intro hx hf => apply hf
 
 example (a : α) : r → (∃ _ : α, r) := by
-  admit
-
+  intro h
+  constructor
+  assumption
+  assumption
 
 example : (∃ x, p x ∧ r) ↔ (∃ x, p x) ∧ r := by
-  admit
-
+  apply Iff.intro
+  . intro h
+    cases h with
+    | intro hx hf =>
+      have hl := Exists.intro hx hf.left
+      exact And.intro hl hf.right  
+  . intro h
+    cases h.left with
+    | intro hx hf => apply Exists.intro hx ⟨hf, h.right⟩ 
 
 example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) := by
-  admit
-
+  apply Iff.intro
+  . intro h
+    cases h with
+    | intro hx hf =>
+      cases hf with
+      | inl hfl => exact Or.inl (Exists.intro hx hfl)
+      | inr hfr => exact Or.inr (Exists.intro hx hfr)
 
 example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) := by
-  admit
-
+  apply Iff.intro
+  . intro h1 h2
+    cases h2 with
+    | intro hx hf => exact hf (h1 hx)
+  . intro h
+    apply (λ ha : α =>
+      Or.elim (em (p ha))
+      (λ hpa : p ha => hpa)
+      (λ hnpa : ¬(p ha) => absurd (Exists.intro ha hnpa) h))
 
 example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) := by
-  admit
-
-
+  apply Iff.intro
+  . intro h1 h2
+    cases h1 with
+    | intro hx hf => apply (h2 hx) hf
+  . intro h1
+    apply (byContradiction fun h2 : ¬(∃ x, p x) =>
+          h1 fun x : α =>
+            fun hx : p x =>
+              h2 ⟨x, hx⟩)
+    
 example : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) := by
-  admit
-
+  apply Iff.intro
+  . intro h
+    apply (λ ha : α =>
+      λ hpx : p ha => h (Exists.intro ha hpx))
+  . intro h1 h2
+    cases h2 with
+    | intro hx hf => apply (h1 hx) hf
 
 example : (¬ ∀ x, p x) ↔ (∃ x, ¬ p x) := by
-  admit
-
+  apply Iff.intro
+  . intro h
+    apply byContradiction
+        fun h2 : ¬(∃ x, ¬ p x) =>
+          h fun x : α =>
+            Or.elim (em (p x))
+              (fun hpx : p x => hpx)
+              (fun hnpx : ¬(p x) => absurd ⟨x, hnpx⟩ h2 )
+  . intro h1 h2
+    cases h1 with
+    | intro hx hf => apply hf (h2 hx)
 
 example : (∀ x, p x → r) ↔ (∃ x, p x) → r := by
-  admit
-
+  apply Iff.intro
+  . intro h1 h2
+    cases h2 with
+    | intro hx hf => apply (h1 hx) hf
+  . intro h
+    apply (λ ha : α =>
+      λ hpa : p ha => h (Exists.intro ha hpa))
 
 example (a : α) : (∃ x, p x → r) ↔ (∀ x, p x) → r := by
-  admit
+  apply Iff.intro
+  . intro h1 h2
+    cases h1 with
+    | intro hx hf => apply hf (h2 hx)
+  . intro h
+    cases em (∀ (x : α), p x) with
+    | inl hem => apply Exists.intro a (λ _ : p a => h hem )
+    | inr hnem => 
+      apply (fun hnap : ¬ ∀ x, p x =>
+        byContradiction
+          (fun hnex : ¬ ∃ x, p x → r =>
+            have hap : ∀ x, p x :=
+              fun x =>
+              byContradiction
+                (fun hnp : ¬ p x =>
+                  have hex : ∃ x, p x → r := ⟨x, (fun hp => absurd hp hnp)⟩
+                  show False from hnex hex)
+            show False from hnap hap))
+      assumption
 
 example (a : α) : (∃ x, r → p x) ↔ (r → ∃ x, p x) := by
-  admit
+  apply Iff.intro
+  . intro h1 h2
+    cases h1 with
+    | intro hx hf => 
+      apply Exists.intro hx (hf h2)
+  . intro h
+    cases (em r) with
+    | inl hl => 
+      cases h hl with
+      | intro hx hf =>
+        apply Exists.intro hx (λ _ : r => hf)
+    | inr h2 =>
+      apply Exists.intro a (fun hr : r =>
+            absurd hr h2)
 
 -- Chapter 5
 example (p q r : Prop) (hp : p)
