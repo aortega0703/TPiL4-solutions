@@ -205,42 +205,74 @@ example : (((p → q) → p) → p) := by
   | inl hp => assumption
   | inr hnp => apply h (λ hp : p => absurd hp hnp)
 
+-- Chapter 4
 variable (α : Type) (p q : α → Prop)
 
 example : (∀ x, p x ∧ q x) ↔ (∀ x, p x) ∧ (∀ x, q x) := by
-  admit
-
+  apply Iff.intro
+  . intro h
+    constructor
+    . apply (λ ha : α => (h ha).left)
+    . apply (λ ha : α => (h ha).right)
+  . intro h
+    apply (λ ha : α => And.intro (h.left ha) (h.right ha))
 
 example : (∀ x, p x → q x) → (∀ x, p x) → (∀ x, q x) := by
-  admit
-
+  intro h1 h2
+  apply (λ ha : α => (h1 ha) (h2 ha))
 
 example : (∀ x, p x) ∨ (∀ x, q x) → ∀ x, p x ∨ q x := by
-  admit
-
+  intro h
+  cases h with
+  | inl hl =>
+    apply (λ ha : α => Or.inl (hl ha))
+  | inr hr =>
+    apply (λ ha : α => Or.inr (hr ha))
 
 variable (r : Prop)
 
 open Classical
 
 example : α → ((∀ _ : α, r) ↔ r) := by
-  admit
-
+  intro h
+  apply Iff.intro
+  . intro hr
+    apply hr h
+  . intro hr _
+    exact hr
 
 example : (∀ x, p x ∨ r) ↔ (∀ x, p x) ∨ r := by
-  admit
-
+  apply Iff.intro
+  . intro h
+    cases (em r) with
+    | inl hr => exact Or.inr hr
+    | inr hnr =>
+      apply Or.inl 
+        (λ ha : α => Or.elim (h ha)
+          (λ hpa : p ha => hpa)
+          (λ hr : r => absurd hr hnr))
+  . intro h
+    apply (λ ha : α =>
+      Or.elim h
+        (λ hpa : (∀ (x : α), p x) => Or.inl (hpa ha))
+        (λ hr : r => Or.inr hr))
 
 example : (∀ x, r → p x) ↔ (r → ∀ x, p x) := by
-  admit
-
+  apply Iff.intro
+  . intro h hr
+    apply (λ ha : α => (h ha) hr )
+  . intro h
+    apply (λ ha : α =>
+      λ hr : r => (h hr) ha )
 
 variable (men : Type) (barber : men)
 variable (shaves : men → men → Prop)
 
 example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : False := by
-  admit
-
+  have hb := h barber
+  cases (em (shaves barber barber)) with
+  | inl hsbb => apply (hb.mp hsbb) hsbb
+  | inr hnsbb => apply hnsbb (hb.mpr hnsbb)
 
 example : (∃ _ : α, r) → r := by
   admit
@@ -284,6 +316,7 @@ example (a : α) : (∃ x, p x → r) ↔ (∀ x, p x) → r := by
 example (a : α) : (∃ x, r → p x) ↔ (r → ∃ x, p x) := by
   admit
 
+-- Chapter 5
 example (p q r : Prop) (hp : p)
   : (p ∨ q ∨ r) ∧ (q ∨ p ∨ r) ∧ (q ∨ r ∨ p) := by
   repeat (first | exact Or.inl hp | exact Or.inr (Or.inl hp) | exact Or.inr (Or.inr hp) | constructor)
