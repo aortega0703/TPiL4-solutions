@@ -206,3 +206,9 @@ example : (((p → q) → p) → p) :=
       (λ hp : p => hp)
       (λ hnp : ¬p =>
         h (λ hp : p => absurd hp hnp))
+
+-- Prove ¬(p ↔ ¬p) without using classical logic.
+example : ¬(p ↔ ¬p) :=
+  λ ⟨h1, h2⟩ => 
+    (h1 (h2 (λ hp => (h1 hp) hp))) (h2 (λ hp => (h1 hp) hp))
+     
