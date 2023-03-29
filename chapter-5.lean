@@ -205,6 +205,13 @@ example : (((p → q) → p) → p) := by
   | inl hp => assumption
   | inr hnp => apply h (λ hp : p => absurd hp hnp)
 
+example : ¬(p ↔ ¬p) := by
+  intro ⟨h1, h2⟩ -- assume for contradiction that p ↔ ¬p
+
+  have hnp : ¬p := λ hp => (h1 hp) hp
+  have hp : p := h2 hnp
+  exact hnp hp
+
 -- Chapter 4
 variable (α : Type) (p q : α → Prop)
 
